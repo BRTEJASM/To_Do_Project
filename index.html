@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>To Do App</h1><br>
+    <form>
+        <div>
+            <input type="text" name="" id="inputValue">
+            <button class="btn">Add To Do</button>
+        </div>
+        <section class="todo-lists-elem">
+        </section>
+    </form>
+    <script>
+        const inValue = document.getElementById("inputValue")
+        const addBtn = document.querySelector(".btn")
+        const mainToDoElem = document.querySelector(".todo-lists-elem")
+
+        
+        const getLocalStorageValue = () => {
+            return JSON.parse(localStorage.getItem("ToDoList")) || [];
+        }
+        let localToDoList = getLocalStorageValue();
+        // *** when you use fat arrow function first of all define and after that call it 
+        
+        const addToDoListLocalStorage = (localToDoList) => {
+            return localStorage.setItem("ToDoList", JSON.stringify(localToDoList)); 
+        }
+
+        const addToDoDynamicElem = (curElem) => {
+            const divElement = document.createElement("div");
+            divElement.classList.add("main_todo_div");
+            divElement.innerHTML = `<li> ${curElem}</li> <button class="deletebtn">Delete</button>`;
+            mainToDoElem.append(divElement);
+            divElement.style.color = "white";
+        };
+        
+        const addToDoList = (e) => {
+            e.preventDefault();
+            // when you tackle with any type of form there is need to add this function named .preventDefault() and pass the e (event) in paramenter and arguement both
+            const toDoListValue = inValue.value.trim();
+            
+            
+            if(toDoListValue !== "" && !localToDoList.includes(toDoListValue)){
+
+                localToDoList.push(toDoListValue);
+                localToDoList = [...new Set(localToDoList)]
+                console.log(localToDoList);
+                localStorage.setItem("ToDoList",JSON.stringify(localToDoList))
+    
+                const divElement = document.createElement("div");
+                divElement.classList.add("main_todo_div");
+                divElement.innerHTML = `<li> ${inValue.value}</li> <button class="deletebtn">Delete</button>`;
+                mainToDoElem.append(divElement);
+                divElement.style.color = "white";
+            }
+            inValue.value ="";
+            
+        };
+
+        const showToDoList = () => {
+            console.log(localToDoList);
+            localToDoList.forEach((curElem) => {
+                addToDoDynamicElem(curElem);
+            });
+            
+        };
+
+        
+        showToDoList();
+        
+        const removeToDoElem = (e) => {
+            const todoToRemove = e.target;
+            let todoListContent = todoToRemove.previousElementSibling.innerText;
+            let parentElem = todoToRemove.parentElement;
+            console.log(todoListContent);
+
+            localToDoList = localToDoList.filter((curTodo) => {
+                // console.log(curToDo);
+                return curTodo.trim().toLowerCase() !== todoListContent.toLowerCase();
+            })
+
+            addToDoListLocalStorage(localToDoList);
+            parentElem.remove();
+              
+            console.log(localToDoList);
+            
+        }
+        
+        mainToDoElem.addEventListener("click",(e) => {
+            e.preventDefault();
+            console.log(e.target.classList.contains("deletebtn"));
+            if(e.target.classList.contains("deletebtn")){
+
+                removeToDoElem(e);
+            }
+        })
+        
+        addBtn.addEventListener("click", (e) => {
+            
+            addToDoList(e);
+        })
+
+    </script>
+
+</body>
+
+</html>
